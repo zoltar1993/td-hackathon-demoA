@@ -1,0 +1,17 @@
+# build myself centos docker image
+# Author: zoltar
+# Time: 2016-05-08 22:53
+
+# based on centos
+FROM docker.io/java
+MAINTAINER zoltar basement_boy@163.com
+
+
+# install psutil
+COPY ./td-hackathon-demoA.jar /opt/
+
+# add entrypoint.sh file as start start script
+COPY ./entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
+
+ENTRYPOINT ["/opt/entrypoint.sh"]
