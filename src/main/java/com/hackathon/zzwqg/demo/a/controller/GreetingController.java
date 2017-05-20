@@ -1,13 +1,13 @@
 package com.hackathon.zzwqg.demo.a.controller;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
 
 /**
  * Created by zoltar on 17-5-20.
@@ -16,15 +16,27 @@ import java.util.Map;
 @RestController
 public class GreetingController {
 
-    @Autowired private DiscoveryClient discoveryClient;
+    @Autowired private MetricRegistry metricRegistry;
+    @Autowired private RestTemplate restTemplate;
+
+    private Timer timer;
+
+    @PostConstruct
+    public void init(){
+        timer = metricRegistry.timer("load");
+    }
 
     @RequestMapping("/")
-    public Map<String,Object> greeting(){
-        HashMap<String,Object> result = new HashMap<>();
+    public String greeting(){
+        Timer.Context context = timer.time();
 
-        result.put("services",discoveryClient.getServices());
-        result.put("demob",discoveryClient.getInstances("demob"));
+        restTemplate.getForObject("http://172.17.0.3:8888/demob/",String.class);
+        restTemplate.getForObject("http://172.17.0.3:8888/demob/",String.class);
+        restTemplate.getForObject("http://172.17.0.3:8888/democ/",String.class);
+        restTemplate.getForObject("http://172.17.0.3:8888/democ/",String.class);
+        restTemplate.getForObject("http://172.17.0.3:8888/democ/",String.class);
 
-        return result;
+        context.stop();
+        return "hello !";
     }
 }
